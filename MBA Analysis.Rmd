@@ -1,0 +1,70 @@
+---
+title: "MBA analysis"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(arules)
+library(arulesViz)
+```
+
+```{r}
+glimpse(Retail)
+```
+
+```{r}
+Retail$InvoiceDate <- as.Date(Retail$InvoiceDate)
+```
+
+```{r}
+glimpse(Retail)
+```
+
+```{r one way to group into a list}
+GroupedRetail <- Retail %>% group_by(InvoiceNo, InvoiceDate) %>%
+  summarise(Descriptions = list(unique(Description)))
+```
+
+```{r the other way to group into a list. also, the better way}
+GroupedRetail2 <- Retail %>% group_by(InvoiceNo,InvoiceDate) %>%
+  summarise(descriptions = toString(unique(Description)))
+```
+
+```{r}
+glimpse(GroupedRetail)
+```
+
+```{r}
+GroupedRetail$InvoiceNo <- NULL
+GroupedRetail$InvoiceDate <- NULL
+```
+
+```{r}
+colnames(GroupedRetail) <- c("items")
+```
+
+```{r write it out to a file in separated form}
+write.csv(GroupedRetail, file = "groupedretail.csv", quote = FALSE, row.names = TRUE)
+```
+
+```{r}
+gr <- read.transactions("pickdata.csv", format = 'basket', sep = ',')
+```
+
+```{r}
+summary(gr)
+```
+
+```{r}
+association.rules <- apriori(gr, parameter = list(supp=0.001, conf=0.8, maxlen= 10))
+```
+
+```{r}
+summary(association.rules)
+```
+
+```{r}
+inspect(association.rules[1:5])
+```
+
