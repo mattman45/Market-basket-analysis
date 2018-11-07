@@ -41,15 +41,15 @@ GroupedRetail$InvoiceDate <- NULL
 ```
 
 ```{r}
-colnames(GroupedRetail) <- c("items")
+colnames(mba) <- c("items")
 ```
 
 ```{r write it out to a file in separated form}
-write.csv(GroupedRetail, file = "groupedretail.csv", quote = FALSE, row.names = TRUE)
+write.csv(mba, file = "WinCoMBA.csv", quote = FALSE, row.names = TRUE)
 ```
 
 ```{r}
-gr <- read.transactions("pickdata.csv", format = 'basket', sep = ',')
+gr <- read.transactions("WincoMBA.csv", format = 'basket', sep = ',')
 ```
 
 ```{r}
@@ -57,7 +57,7 @@ summary(gr)
 ```
 
 ```{r}
-association.rules <- apriori(gr, parameter = list(supp=0.001, conf=0.8, maxlen= 10))
+association.rules <- apriori(gr, parameter = list(supp=0.001, conf=0.90, minlen=2, maxlen= 5, maxtime= 30))
 ```
 
 ```{r}
@@ -65,6 +65,22 @@ summary(association.rules)
 ```
 
 ```{r}
-inspect(association.rules[1:5])
+inspect(association.rules[1:25])
+```
+
+```{r}
+write(association.rules,
+      file = "association.rules.csv",
+      sep = ",",
+      quote = TRUE,
+      row.names = FALSE)
+```
+
+```{r}
+top.ruless <- head(association.rules, n=20, by = "confidence")
+```
+
+```{r}
+plot(top.ruless,method="graph")
 ```
 
